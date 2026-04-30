@@ -1,4 +1,4 @@
-# Experiment 09 – Upsampling with ReviewerRating Feature Restored
+# Experiment 08 – Upsampling with ReviewerRating Feature Restored
 
 ## What Changed
 Restored `reviewerRating` as a feature column (removed the drop line from
