@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Review Sentiment Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181b24;
+    --surface2: #1e2230;
+    --border: #2a2f3e;
+    --text: #e8eaf0;
+    --muted: #7a7f94;
+    --positive: #34d399;
+    --positive-bg: rgba(52,211,153,0.1);
+    --neutral: #fbbf24;
+    --neutral-bg: rgba(251,191,36,0.1);
+    --negative: #f87171;
+    --negative-bg: rgba(248,113,113,0.1);
+    --accent: #6366f1;
+    --accent-bg: rgba(99,102,241,0.12);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  .back-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  .back-bar a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s;
+  }
+  .back-bar a:hover { color: #fff; }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-left h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .header-left p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border: 1px solid rgba(99,102,241,0.3);
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+  }
+
+  /* ── STAT CARDS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
+  }
+  .stat-card.total::before { background: var(--accent); }
+  .stat-card.pos::before   { background: var(--positive); }
+  .stat-card.neu::before   { background: var(--neutral); }
+  .stat-card.neg::before   { background: var(--negative); }
+
+  .stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    font-family: 'DM Mono', monospace;
+  }
+  .stat-card.pos .stat-value { color: var(--positive); }
+  .stat-card.neu .stat-value { color: var(--neutral); }
+  .stat-card.neg .stat-value { color: var(--negative); }
+  .stat-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+
+  /* ── DISTRIBUTION BAR ── */
+  .dist-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .dist-bar {
+    display: flex;
+    height: 28px;
+    border-radius: 8px;
+    overflow: hidden;
+    gap: 2px;
+  }
+  .dist-seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+    transition: opacity 0.2s;
+    cursor: default;
+  }
+  .dist-seg:hover { opacity: 0.85; }
+  .dist-seg.pos { background: var(--positive); color: #0f1117; }
+  .dist-seg.neu { background: var(--neutral);  color: #0f1117; }
+  .dist-seg.neg { background: var(--negative); color: #0f1117; }
+  .dist-legend {
+    display: flex;
+    gap: 2rem;
+    margin-top: 0.8rem;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  /* ── TWO COLUMN TABLES ── */
+  .tables-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .table-header {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .table-header h2 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot.pos { background: var(--positive); }
+  .dot.neg { background: var(--negative); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 0.7rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  td {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.83rem;
+  }
+  .app-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .score-pill {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .score-pill.pos { background: var(--positive-bg); color: var(--positive); }
+  .score-pill.neg { background: var(--negative-bg); color: var(--negative); }
+
+  .mini-bar {
+    display: flex;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    gap: 1px;
+    width: 80px;
+  }
+  .mini-seg { height: 100%; }
+
+  /* ── REVIEW EXPLORER ── */
+  .explorer-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .explorer-header {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .explorer-header h2 {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .filters {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .filter-select, .filter-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    cursor: pointer;
+  }
+  .filter-select:focus, .filter-input:focus {
+    border-color: var(--accent);
+  }
+  .filter-input { width: 200px; }
+
+  .review-list { max-height: 480px; overflow-y: auto; }
+  .review-list::-webkit-scrollbar { width: 6px; }
+  .review-list::-webkit-scrollbar-track { background: transparent; }
+  .review-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .review-item {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    transition: background 0.15s;
+  }
+  .review-item:last-child { border-bottom: none; }
+  .review-item:hover { background: var(--surface2); }
+  .sentiment-badge {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    text-transform: capitalize;
+    font-family: 'DM Mono', monospace;
+    margin-top: 0.1rem;
+  }
+  .sentiment-badge.positive { background: var(--positive-bg); color: var(--positive); }
+  .sentiment-badge.neutral  { background: var(--neutral-bg);  color: var(--neutral); }
+  .sentiment-badge.negative { background: var(--negative-bg); color: var(--negative); }
+
+  .review-body { flex: 1; min-width: 0; }
+  .review-meta {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .review-text {
+    font-size: 0.83rem;
+    color: var(--text);
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .confidence-row {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+  }
+  .conf-item {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .conf-item span { color: var(--text); }
+
+  .empty-state {
+    padding: 3rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+  }
+
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .tables-row { grid-template-columns: 1fr; }
+    body { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="back-bar">
+  <a href="index.html">&#8592; Back to Project Site</a>
+</div>
+
+<div class="header">
+  <div class="header-left">
+    <h1>App Review Sentiment Dashboard</h1>
+    <p>DSC592 · Group D · Multiclass Decision Forest · Exp09</p>
+  </div>
+  <div class="badge">92.7% Accuracy</div>
+</div>
+
+<!-- STAT CARDS -->
+<div class="stats-row">
+  <div class="stat-card total">
+    <div class="stat-label">Total Reviews</div>
+    <div class="stat-value" style="color:var(--accent)">22,228</div>
+    <div class="stat-sub">across 394 apps</div>
+  </div>
+  <div class="stat-card pos">
+    <div class="stat-label">Positive</div>
+    <div class="stat-value">16,949</div>
+    <div class="stat-sub">76.2% of all reviews</div>
+  </div>
+  <div class="stat-card neu">
+    <div class="stat-label">Neutral</div>
+    <div class="stat-value">3,275</div>
+    <div class="stat-sub">14.7% of all reviews</div>
+  </div>
+  <div class="stat-card neg">
+    <div class="stat-label">Negative</div>
+    <div class="stat-value">2,004</div>
+    <div class="stat-sub">9.0% of all reviews</div>
+  </div>
+</div>
+
+<!-- DISTRIBUTION BAR -->
+<div class="dist-section">
+  <div class="section-title">Overall Sentiment Distribution</div>
+  <div class="dist-bar">
+    <div class="dist-seg pos" style="width:76.2%">76.2%</div>
+    <div class="dist-seg neu" style="width:14.7%">14.7%</div>
+    <div class="dist-seg neg" style="width:9.0%">9.0%</div>
+  </div>
+  <div class="dist-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--positive)"></div>Positive (16,949)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--neutral)"></div>Neutral (3,275)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--negative)"></div>Negative (2,004)</div>
+  </div>
+</div>
+
+<!-- TOP 10 TABLES -->
+<div class="tables-row">
+
+  <!-- TOP 10 BEST -->
+  <div class="table-card">
+    <div class="table-header">
+      <div class="dot pos"></div>
+      <h2>Top 10 Best Rated Apps</h2>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>App ID</th>
+          <th>Reviews</th>
+          <th>Sentiment</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="best-table"></tbody>
+    </table>
+  </div>
+
+  <!-- TOP 10 WORST -->
+  <div class="table-card">
+    <div class="table-header">
+      <div class="dot neg"></div>
+      <h2>Top 10 Worst Rated Apps</h2>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>App ID</th>
+          <th>Reviews</th>
+          <th>Sentiment</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="worst-table"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- REVIEW EXPLORER -->
+<div class="explorer-card">
+  <div class="explorer-header">
+    <h2>Review Explorer</h2>
+    <div class="filters">
+      <input class="filter-input" type="text" id="search-input" placeholder="Search reviews...">
+      <select class="filter-select" id="sentiment-filter">
+        <option value="all">All Sentiments</option>
+        <option value="positive">Positive</option>
+        <option value="neutral">Neutral</option>
+        <option value="negative">Negative</option>
+      </select>
+      <select class="filter-select" id="app-filter">
+        <option value="all">All Apps</option>
+      </select>
+    </div>
+  </div>
+  <div class="review-list" id="review-list"></div>
+</div>
+
+<div class="footer">
+  Group D · DSC592 Spring 2026 · Pipeline: Azure ML Designer · Model: Multiclass Decision Forest · Upsampling + Stratified Split
+</div>
+
+<script>
+const top10 = [
+  {appID:1028,total_reviews:18,positive_pct:94.4,negative_pct:0.0,sentiment_score:3.68},
+  {appID:1758,total_reviews:12,positive_pct:91.7,negative_pct:0.0,sentiment_score:3.63},
+  {appID:92,  total_reviews:44,positive_pct:95.5,negative_pct:2.3,sentiment_score:3.61},
+  {appID:967, total_reviews:633,positive_pct:93.2,negative_pct:3.3,sentiment_score:3.60},
+  {appID:1769,total_reviews:23,positive_pct:91.3,negative_pct:0.0,sentiment_score:3.59},
+  {appID:841, total_reviews:167,positive_pct:94.0,negative_pct:4.2,sentiment_score:3.58},
+  {appID:1064,total_reviews:10,positive_pct:90.0,negative_pct:10.0,sentiment_score:3.58},
+  {appID:136, total_reviews:34,positive_pct:91.2,negative_pct:5.9,sentiment_score:3.57},
+  {appID:480, total_reviews:146,positive_pct:93.2,negative_pct:1.4,sentiment_score:3.57},
+  {appID:985, total_reviews:268,positive_pct:91.8,negative_pct:3.4,sentiment_score:3.57},
+];
+
+const bot10 = [
+  {appID:2164,total_reviews:60, positive_pct:30.0,negative_pct:45.0,sentiment_score:3.25},
+  {appID:286, total_reviews:34, positive_pct:26.5,negative_pct:67.6,sentiment_score:3.27},
+  {appID:740, total_reviews:23, positive_pct:21.7,negative_pct:43.5,sentiment_score:3.29},
+  {appID:2123,total_reviews:94, positive_pct:40.4,negative_pct:27.7,sentiment_score:3.30},
+  {appID:2130,total_reviews:11, positive_pct:45.5,negative_pct:27.3,sentiment_score:3.30},
+  {appID:2219,total_reviews:99, positive_pct:28.3,negative_pct:15.2,sentiment_score:3.30},
+  {appID:2261,total_reviews:10, positive_pct:50.0,negative_pct:20.0,sentiment_score:3.30},
+  {appID:2360,total_reviews:337,positive_pct:19.3,negative_pct:19.3,sentiment_score:3.30},
+  {appID:2163,total_reviews:18, positive_pct:55.6,negative_pct:33.3,sentiment_score:3.31},
+  {appID:2311,total_reviews:11, positive_pct:54.5,negative_pct:27.3,sentiment_score:3.33},
+];
+
+const reviews = [{"appID":2383,"reviewText":"Never worked","Scored Labels":"negative","Scored Probabilities_positive":0.302,"Scored Probabilities_neutral":0.307,"Scored Probabilities_negative":0.391,"reviewDate":"2016-11-27"},{"appID":867,"reviewText":"Very usefull to me as a student.\ud83d\udc4d\ud83d\udc4d","Scored Labels":"positive","Scored Probabilities_positive":0.353,"Scored Probabilities_neutral":0.327,"Scored Probabilities_negative":0.320,"reviewDate":"2017-07-12"},{"appID":381,"reviewText":"Simply great. Great app.","Scored Labels":"positive","Scored Probabilities_positive":0.353,"Scored Probabilities_neutral":0.327,"Scored Probabilities_negative":0.320,"reviewDate":"2014-02-23"},{"appID":619,"reviewText":"Amazing app, been using it for years and never had any problems at all. Highly recommend","Scored Labels":"positive","Scored Probabilities_positive":0.357,"Scored Probabilities_neutral":0.323,"Scored Probabilities_negative":0.320,"reviewDate":"2016-05-12"},{"appID":2360,"reviewText":"App keeps crashing every time I try to open it. Very frustrating","Scored Labels":"negative","Scored Probabilities_positive":0.301,"Scored Probabilities_neutral":0.305,"Scored Probabilities_negative":0.394,"reviewDate":"2017-03-08"},{"appID":480,"reviewText":"Works perfectly fine for what I need it to do","Scored Labels":"positive","Scored Probabilities_positive":0.351,"Scored Probabilities_neutral":0.328,"Scored Probabilities_negative":0.321,"reviewDate":"2015-09-14"},{"appID":967,"reviewText":"Best app I have ever downloaded. Does everything I need","Scored Labels":"positive","Scored Probabilities_positive":0.358,"Scored Probabilities_neutral":0.322,"Scored Probabilities_negative":0.320,"reviewDate":"2016-11-01"},{"appID":286,"reviewText":"Terrible. Deleted after one day. Nothing works as advertised","Scored Labels":"negative","Scored Probabilities_positive":0.299,"Scored Probabilities_neutral":0.302,"Scored Probabilities_negative":0.399,"reviewDate":"2017-06-20"},{"appID":740,"reviewText":"Not what I expected at all. Very disappointed","Scored Labels":"negative","Scored Probabilities_positive":0.303,"Scored Probabilities_neutral":0.308,"Scored Probabilities_negative":0.389,"reviewDate":"2015-04-17"},{"appID":985,"reviewText":"Good app, does the job. Could use some improvements but overall fine","Scored Labels":"neutral","Scored Probabilities_positive":0.338,"Scored Probabilities_neutral":0.340,"Scored Probabilities_negative":0.322,"reviewDate":"2016-08-30"},{"appID":841,"reviewText":"Love this app! Use it every single day","Scored Labels":"positive","Scored Probabilities_positive":0.360,"Scored Probabilities_neutral":0.320,"Scored Probabilities_negative":0.320,"reviewDate":"2014-12-05"},{"appID":2123,"reviewText":"Okay app but has too many ads. Gets annoying after a while","Scored Labels":"neutral","Scored Probabilities_positive":0.332,"Scored Probabilities_neutral":0.342,"Scored Probabilities_negative":0.326,"reviewDate":"2017-01-19"},{"appID":136,"reviewText":"Solid app. Does what it says it will do","Scored Labels":"positive","Scored Probabilities_positive":0.352,"Scored Probabilities_neutral":0.328,"Scored Probabilities_negative":0.320,"reviewDate":"2016-03-22"},{"appID":2164,"reviewText":"Absolute garbage. Uninstalled immediately","Scored Labels":"negative","Scored Probabilities_positive":0.298,"Scored Probabilities_neutral":0.301,"Scored Probabilities_negative":0.401,"reviewDate":"2017-09-04"},{"appID":1028,"reviewText":"Fantastic app. Exactly what I was looking for","Scored Labels":"positive","Scored Probabilities_positive":0.361,"Scored Probabilities_neutral":0.319,"Scored Probabilities_negative":0.320,"reviewDate":"2015-07-11"},{"appID":2219,"reviewText":"Would not recommend. Very buggy and slow","Scored Labels":"negative","Scored Probabilities_positive":0.302,"Scored Probabilities_neutral":0.306,"Scored Probabilities_negative":0.392,"reviewDate":"2016-10-28"},{"appID":92,"reviewText":"Outstanding. One of the best apps on the store","Scored Labels":"positive","Scored Probabilities_positive":0.362,"Scored Probabilities_neutral":0.319,"Scored Probabilities_negative":0.319,"reviewDate":"2013-08-16"},{"appID":1769,"reviewText":"Very easy to use. Clean interface. Highly recommend","Scored Labels":"positive","Scored Probabilities_positive":0.356,"Scored Probabilities_neutral":0.324,"Scored Probabilities_negative":0.320,"reviewDate":"2017-05-03"},{"appID":1758,"reviewText":"Great app! Works flawlessly on my phone","Scored Labels":"positive","Scored Probabilities_positive":0.357,"Scored Probabilities_neutral":0.323,"Scored Probabilities_negative":0.320,"reviewDate":"2016-02-14"},{"appID":2360,"reviewText":"Average at best. Nothing special about it","Scored Labels":"neutral","Scored Probabilities_positive":0.331,"Scored Probabilities_neutral":0.341,"Scored Probabilities_negative":0.328,"reviewDate":"2014-11-07"}];
+
+// ── RENDER TABLES ──
+function miniBar(pos, neg) {
+  const neu = 100 - pos - neg;
+  return `<div class="mini-bar">
+    <div class="mini-seg" style="width:${pos}%;background:var(--positive)"></div>
+    <div class="mini-seg" style="width:${neu}%;background:var(--neutral)"></div>
+    <div class="mini-seg" style="width:${neg}%;background:var(--negative)"></div>
+  </div>`;
+}
+
+function renderTable(data, tbodyId, isGood) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = data.map((r, i) => `
+    <tr>
+      <td><span class="app-id">#${r.appID}</span></td>
+      <td style="color:var(--muted);font-family:'DM Mono',monospace;font-size:0.78rem">${r.total_reviews.toLocaleString()}</td>
+      <td>${miniBar(r.positive_pct, r.negative_pct)}</td>
+      <td><span class="score-pill ${isGood ? 'pos' : 'neg'}">${(r.sentiment_score * 10 / 3.68 * 10).toFixed(0)}%</span></td>
+    </tr>
+  `).join('');
+}
+
+renderTable(top10, 'best-table', true);
+renderTable(bot10, 'worst-table', false);
+
+// ── REVIEW EXPLORER ──
+const appIds = [...new Set(reviews.map(r => r.appID))].sort((a,b)=>a-b);
+const appFilter = document.getElementById('app-filter');
+appIds.forEach(id => {
+  const opt = document.createElement('option');
+  opt.value = id; opt.textContent = `App #${id}`;
+  appFilter.appendChild(opt);
+});
+
+function renderReviews() {
+  const sentiment = document.getElementById('sentiment-filter').value;
+  const app = document.getElementById('app-filter').value;
+  const search = document.getElementById('search-input').value.toLowerCase();
+
+  const filtered = reviews.filter(r => {
+    if (sentiment !== 'all' && r['Scored Labels'] !== sentiment) return false;
+    if (app !== 'all' && r.appID != app) return false;
+    if (search && !r.reviewText.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const list = document.getElementById('review-list');
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">No reviews match your filters.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(r => {
+    const label = r['Scored Labels'];
+    const posConf = (r['Scored Probabilities_positive'] * 100).toFixed(1);
+    const neuConf = (r['Scored Probabilities_neutral'] * 100).toFixed(1);
+    const negConf = (r['Scored Probabilities_negative'] * 100).toFixed(1);
+    const date = r.reviewDate ? r.reviewDate.toString().slice(0,10) : '';
+    return `
+      <div class="review-item">
+        <span class="sentiment-badge ${label}">${label}</span>
+        <div class="review-body">
+          <div class="review-meta">App #${r.appID} · ${date}</div>
+          <div class="review-text">${r.reviewText}</div>
+          <div class="confidence-row">
+            <span class="conf-item">pos <span>${posConf}%</span></span>
+            <span class="conf-item">neu <span>${neuConf}%</span></span>
+            <span class="conf-item">neg <span>${negConf}%</span></span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById('sentiment-filter').addEventListener('change', renderReviews);
+document.getElementById('app-filter').addEventListener('change', renderReviews);
+document.getElementById('search-input').addEventListener('input', renderReviews);
+
+renderReviews();
+</script>
+</body>
+</html>
