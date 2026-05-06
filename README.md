@@ -1,235 +1,109 @@
-# DSC 592 Project Repository Template
+# 📱 App Review Sentiment Pipeline
 
-Welcome to the DSC 592 – Software Engineering for Data Science project template.
+> A machine learning pipeline that classifies mobile app store reviews into positive, neutral, and negative sentiment using a Multiclass Decision Forest, achieving **92.7% accuracy**. Built with Azure ML Studio and includes a stakeholder dashboard with filtering and confidence score display.
 
-This repository provides a recommended structure for organizing your project code, documentation, experiments, and artifacts during the semester.
+**DSC592 · Group D · University of North Carolina Wilmington · Spring 2026**
 
-The goal is to help you treat your project like a small software system, not just a collection of notebooks.
+---
 
----------------------------------------------------------------------
+## 👥 Team
 
-# What This Template Is For
+| Name | Role |
+|------|------|
+| Jacob Woodard | Webpage, GitHub Management, ML Pipeline |
+| Michelle Messer | ML Model Management, GitHub Management, Dashboard |
+| Scarlett Shropshire | Research, Documentation, Architecture Diagrams |
 
-In this course you will develop a data science system. This usually includes:
+---
 
-- a project vision
-- requirements
-- architecture design
-- experiments and evaluation
-- source code
-- documentation of decisions
+## 🏆 Final Model Performance
 
-This repository structure helps organize these components.
+| Metric | Value |
+|--------|-------|
+| Overall Accuracy | **92.7%** |
+| Macro Precision | 0.886 |
+| Macro Recall | 0.901 |
+| Total Reviews | 22,228 |
+| Apps Covered | 492 |
+| Model | Multiclass Decision Forest |
 
----------------------------------------------------------------------
+---
 
-# Repository Structure
+## 📊 Dashboard
 
-    .
-    ├── azure
-    │   └── README.md
-    ├── docs
-    │   ├── architecture.md
-    │   ├── PHASE_REPORT_ph01.md
-    │   ├── requirement.md
-    │   ├── risk-register.md
-    │   └── vision.md
-    ├── experiments
-    │   └── EXAMPLE_EXP.md
-    ├── notebooks
-    │   └── README.md
-    ├── src
-    │   └── README.md
-    └── web
-        └── README.md
+![App Review Sentiment Dashboard](docs/dashboard_screenshot.png)
 
----------------------------------------------------------------------
+The dashboard gives stakeholders a live view of model results including top 10 best and worst rated apps, overall sentiment distribution, and a filterable review explorer with confidence scores per prediction.
 
-# Folder Guide
+---
 
-## docs/
+## 🔄 Pipeline Architecture
 
-This folder contains your software engineering documentation.
+![Sequence Diagram](docs/sequence_diagram.png)
 
-Example files:
+### Pipeline Stages
 
-- vision.md
-- requirement.md
-- architecture.md
-- risk-register.md
+```
+Data Ingestion
+    └── Sentiment Binning (negative / neutral / positive)
+        └── Feature Engineering (exclamation count, question count, text length)
+            └── Preprocess Text (normalization)
+                └── Stratified Split (80% train / 20% test)
+                    ├── Upsampling (train only) → Train Model (Multiclass Decision Forest)
+                    └── Score Model → Evaluate Model
+```
 
-Example content for vision.md:
+---
 
-    # Project Vision
+## 🧪 Experiment Log
 
-    ## Problem Statement
-    Many small farmers lack access to reliable weather forecasts.
+| Experiment | Change | Metric | Result |
+|------------|--------|--------|--------|
+| Exp01 | Baseline Linear Regression | R² | 0.059 |
+| Exp02 | Stratified Split | R² | 0.059 |
+| Exp04 | Boosted Decision Tree | R² | 0.106 |
+| Exp05 | Sentiment Feature Engineering | R² | 0.151 |
+| Exp06 | Multiclass Classification | Accuracy | 77.7% |
+| Exp07 | Hyperparameter Tuning | Accuracy | 77.7% |
+| Exp08 | Upsampling (balanced classes) | Accuracy | 92.7% ✅ |
 
-    ## Goal
-    Develop a machine learning system that predicts rainfall using historical weather data.
+Full experiment logs with screenshots are in the [`/experiments`](./experiments/) folder.
 
----------------------------------------------------------------------
+---
 
-## src/
+## 🛠️ Tech Stack
 
-Contains the main source code for your system.
+![Azure ML](https://img.shields.io/badge/Azure%20ML-Studio-0078D4?style=flat&logo=microsoftazure)
+![Python](https://img.shields.io/badge/Python-3.8-3776AB?style=flat&logo=python)
+![GitHub Pages](https://img.shields.io/badge/GitHub-Pages-222222?style=flat&logo=github)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-upsampling-F7931E?style=flat&logo=scikitlearn)
 
-Example structure:
+---
 
-    src/
-    ├── data
-    │   └── preprocessing.py
-    ├── models
-    │   └── train_model.py
-    └── utils
-        └── helpers.py
+## 📁 Repository Structure
 
-Example code snippet:
+```
+├── docs/               # Reports, diagrams, and documentation
+├── experiments/        # Markdown logs and screenshots for each experiment
+├── notebooks/          # Data exploration notebooks
+├── src/                # Source scripts
+├── web/                # Project webpage files
+└── azure/              # Azure ML pipeline notes
+```
 
-    def train_model(data):
-        model.fit(data)
-        return model
+---
 
----------------------------------------------------------------------
+## 🌐 Project Webpage
 
-## notebooks/
+The live project webpage is available via GitHub Pages and includes architecture diagrams, pipeline visualization, metrics, and an interactive phase tracker.
 
-Used for exploration and prototyping.
+---
 
-Typical uses:
-
-- exploratory data analysis
-- quick experiments
-- visualization
-
-Example notebook structure:
-
-    notebooks/
-    ├── 01_data_exploration.ipynb
-    ├── 02_feature_engineering.ipynb
-    └── 03_model_experiments.ipynb
-
-Note:
-Notebooks are useful for exploration, but final system logic should usually move into src/.
-
----------------------------------------------------------------------
-
-## experiments/
-
-Use this folder to record experiments.
-
-Example experiment documentation:
-
-    # Experiment: Random Forest Baseline
-
-    Goal
-    Evaluate a Random Forest model as a baseline classifier.
-
-    Dataset
-    Weather dataset (2010–2023)
-
-    Configuration
-    Model: RandomForestClassifier
-    Trees: 200
-    Max depth: 10
-
-    Results
-    Accuracy: 0.81
-
-    Observations
-    Model performs well but struggles with rare events.
-
----------------------------------------------------------------------
-
-## web/
-
-Optional folder for interfaces or APIs.
-
-Examples:
-
-- dashboards
-- REST APIs
-- front-end applications
-
-Example structure:
-
-    web/
-    ├── app.py
-    ├── templates
-    └── static
-
----------------------------------------------------------------------
-
-## azure/
-
-Used if you deploy the project to the cloud.
-
-Example contents:
-
-    azure/
-    ├── deployment.md
-    └── infrastructure.yaml
-
----------------------------------------------------------------------
-
-# Markdown Tips
-
-You will write many .md files in this project. Here are some useful examples.
-
-Headings:
-
-    # Main Title
-    ## Section
-    ### Subsection
-
-Lists:
-
-- item one
-- item two
-- item three
-
-Code blocks:
-
-    print("Hello world")
-
-Quotes:
-
-    > This is a useful observation about the system.
-
-Tables:
-
-    | Model | Accuracy |
-    |------|---------|
-    | Logistic Regression | 0.75 |
-    | Random Forest | 0.81 |
-
----------------------------------------------------------------------
-
-# Suggested Workflow
-
-A typical project progression:
-
-1. Define the project vision
-2. Write requirements
-3. Design the system architecture
-4. Track risks
-5. Explore data using notebooks
-6. Implement code in src
-7. Document experiments
-8. Optional: build a web interface
-9. Optional: deploy the system
-
----------------------------------------------------------------------
-
-# Final Note
-
-This repository should become a living record of your project.
-
-Good projects document:
-
-- what decisions were made
-- why they were made
-- what experiments were performed
-- what results were obtained
-
-Clear documentation will make your system easier to understand, evaluate, and extend.
+## 📄 Reports
+
+All phase reports are available in the [`/docs`](./docs/) folder:
+- Phase 1 — Inception
+- Phase 2 — Elaboration and Planning
+- Phase 3 — Construction
+- Phase 4 — Transition
+- Cumulative Final Report
