@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sequence Diagram – App Review Rating System (Final Pipeline)</title>
+<style>
+  body {
+    background: #ffffff;
+    font-family: Arial, sans-serif;
+    padding: 30px;
+  }
+  h2 {
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: #222;
+  }
+  p.sub {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 30px;
+  }
+  svg {
+    display: block;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<h2>Sequence Diagram – App Review Rating System (Final Pipeline)</h2>
+<p class="sub">Group D | DSC592 | Azure ML Pipeline: user_feedback → Binning Script → Feature Eng. Script → Preprocess Text → Split Data → Upsample Script (train only) → Multiclass Decision Forest + Train Model → Score Model</p>
+
+<svg width="1100" height="860" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif" font-size="12">
+
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="black"/>
+    </marker>
+    <marker id="arr-gray" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="gray"/>
+    </marker>
+  </defs>
+
+  <!--
+    Column centers (x):
+    User=55, Binning=175, FeatureEng=295, Preprocess=415, SplitData=530,
+    Upsample=645, TrainModel=760, ScoreModel=875
+  -->
+
+  <!-- ═══════════════════════════════════════
+       ACTOR / OBJECT BOXES – TOP
+  ═══════════════════════════════════════ -->
+
+  <!-- :User -->
+  <rect x="15" y="20" width="80" height="36" fill="white" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="55" y="43" text-anchor="middle" font-weight="bold">:User</text>
+
+  <!-- :Binning Script -->
+  <rect x="133" y="20" width="84" height="36" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5" rx="4"/>
+  <text x="175" y="36" text-anchor="middle" font-weight="bold" font-size="11">:Binning</text>
+  <text x="175" y="50" text-anchor="middle" font-size="10" fill="#085041">Script</text>
+
+  <!-- :Feature Eng Script -->
+  <rect x="253" y="20" width="84" height="36" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5" rx="4"/>
+  <text x="295" y="36" text-anchor="middle" font-weight="bold" font-size="11">:Feature Eng.</text>
+  <text x="295" y="50" text-anchor="middle" font-size="10" fill="#085041">Script</text>
+
+  <!-- :Preprocess Text -->
+  <rect x="373" y="20" width="84" height="36" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5" rx="4"/>
+  <text x="415" y="36" text-anchor="middle" font-weight="bold" font-size="11">:Preprocess</text>
+  <text x="415" y="50" text-anchor="middle" font-size="10" fill="#0C447C">Text</text>
+
+  <!-- :Split Data -->
+  <rect x="488" y="20" width="84" height="36" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5" rx="4"/>
+  <text x="530" y="36" text-anchor="middle" font-weight="bold" font-size="11">:Split</text>
+  <text x="530" y="50" text-anchor="middle" font-size="10" fill="#0C447C">Data</text>
+
+  <!-- :Upsample Script -->
+  <rect x="603" y="20" width="84" height="36" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5" rx="4"/>
+  <text x="645" y="36" text-anchor="middle" font-weight="bold" font-size="11">:Upsample</text>
+  <text x="645" y="50" text-anchor="middle" font-size="10" fill="#085041">Script</text>
+
+  <!-- :Train Model -->
+  <rect x="718" y="20" width="84" height="36" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5" rx="4"/>
+  <text x="760" y="36" text-anchor="middle" font-weight="bold" font-size="11">:Train</text>
+  <text x="760" y="50" text-anchor="middle" font-size="10" fill="#633806">Model</text>
+
+  <!-- :Score Model -->
+  <rect x="833" y="20" width="84" height="36" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5" rx="4"/>
+  <text x="875" y="36" text-anchor="middle" font-weight="bold" font-size="11">:Score</text>
+  <text x="875" y="50" text-anchor="middle" font-size="10" fill="#633806">Model</text>
+
+  <!-- ═══════════════════════════════════════
+       LIFELINES
+  ═══════════════════════════════════════ -->
+  <line x1="55"  y1="56" x2="55"  y2="780" stroke="black" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="175" y1="56" x2="175" y2="780" stroke="black" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="295" y1="56" x2="295" y2="780" stroke="black" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="415" y1="56" x2="415" y2="780" stroke="black" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="530" y1="56" x2="530" y2="780" stroke="black" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="645" y1="56" x2="645" y2="780" stroke="black" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="760" y1="56" x2="760" y2="780" stroke="black" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="875" y1="56" x2="875" y2="780" stroke="black" stroke-width="1" stroke-dasharray="6,4"/>
+
+  <!-- ═══════════════════════════════════════
+       ACTIVATION BOXES
+  ═══════════════════════════════════════ -->
+  <rect x="51"  y="100" width="8" height="580" fill="#ccc"/>
+  <rect x="171" y="120" width="8" height="70"  fill="#9FE1CB"/>
+  <rect x="291" y="210" width="8" height="70"  fill="#9FE1CB"/>
+  <rect x="411" y="300" width="8" height="70"  fill="#B5D4F4"/>
+  <rect x="526" y="390" width="8" height="70"  fill="#B5D4F4"/>
+  <rect x="641" y="480" width="8" height="70"  fill="#9FE1CB"/>
+  <rect x="756" y="570" width="8" height="70"  fill="#FAC775"/>
+  <rect x="871" y="640" width="8" height="70"  fill="#FAC775"/>
+
+  <!-- ═══════════════════════════════════════
+       MESSAGES
+  ═══════════════════════════════════════ -->
+
+  <!-- 1. User → Binning: loadDataset(rawReviews) -->
+  <line x1="59" y1="130" x2="169" y2="130" stroke="black" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="113" y="124" text-anchor="middle" font-size="11">1. loadDataset(rawReviews)</text>
+
+  <!-- 2. Binning → FeatureEng: dataOutput(sentiment_class) -->
+  <line x1="179" y1="220" x2="289" y2="220" stroke="black" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="234" y="214" text-anchor="middle" font-size="11">2. dataOutput(sentiment_class)</text>
+
+  <!-- 3. FeatureEng → Preprocess: dataOutput(features) -->
+  <line x1="299" y1="310" x2="409" y2="310" stroke="black" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="352" y="304" text-anchor="middle" font-size="11">3. dataOutput(features)</text>
+
+  <!-- 4. Preprocess → Split: resultsDataset(cleanedText) -->
+  <line x1="419" y1="400" x2="524" y2="400" stroke="black" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="470" y="394" text-anchor="middle" font-size="11">4. resultsDataset(cleanedText)</text>
+
+  <!-- 5. Split → Upsample: trainSet (80%, stratified on sentiment_class) -->
+  <line x1="534" y1="490" x2="639" y2="490" stroke="black" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="586" y="484" text-anchor="middle" font-size="11">5. trainSet (80%, stratified)</text>
+
+  <!-- 6. Upsample → Train: balancedTrainSet -->
+  <line x1="649" y1="580" x2="754" y2="580" stroke="black" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="700" y="574" text-anchor="middle" font-size="11">6. balancedTrainSet()</text>
+
+  <!-- 7. MDF → Train (untrained model) — comes from left margin annotation -->
+  <line x1="20" y1="610" x2="754" y2="610" stroke="#555" stroke-width="1" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+  <text x="385" y="604" text-anchor="middle" font-size="10" fill="#555">7. untrainedModel() [Multiclass Decision Forest]</text>
+
+  <!-- 8. Train → Score: trainedModel -->
+  <line x1="764" y1="650" x2="869" y2="650" stroke="black" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="815" y="644" text-anchor="middle" font-size="11">8. trainedModel()</text>
+
+  <!-- 9. Split → Score: testSet (20%) — L-bend path -->
+  <path d="M530 460 L530 680 L869 680" stroke="black" stroke-width="1.5" marker-end="url(#arr)" fill="none"/>
+  <text x="690" y="698" text-anchor="middle" font-size="11">9. testSet (20%, unstratified)</text>
+
+  <!-- 10. Score → User: return scoredDataset (dashed return) -->
+  <path d="M875 710 L875 730 L55 730" stroke="gray" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#arr-gray)" fill="none"/>
+  <text x="465" y="750" text-anchor="middle" font-size="11" fill="gray">10. return scoredLabels (positive / neutral / negative) + evaluationResults</text>
+
+  <!-- ═══════════════════════════════════════
+       BOTTOM ACTOR BOXES
+  ═══════════════════════════════════════ -->
+  <rect x="15"  y="760" width="80" height="32" fill="white"   stroke="#333"    stroke-width="1.5" rx="4"/>
+  <text x="55"  y="781" text-anchor="middle" font-weight="bold" font-size="11">:User</text>
+
+  <rect x="133" y="760" width="84" height="32" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5" rx="4"/>
+  <text x="175" y="781" text-anchor="middle" font-weight="bold" font-size="11">:Binning</text>
+
+  <rect x="253" y="760" width="84" height="32" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5" rx="4"/>
+  <text x="295" y="781" text-anchor="middle" font-weight="bold" font-size="11">:Feature Eng.</text>
+
+  <rect x="373" y="760" width="84" height="32" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5" rx="4"/>
+  <text x="415" y="781" text-anchor="middle" font-weight="bold" font-size="11">:Preprocess</text>
+
+  <rect x="488" y="760" width="84" height="32" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5" rx="4"/>
+  <text x="530" y="781" text-anchor="middle" font-weight="bold" font-size="11">:Split Data</text>
+
+  <rect x="603" y="760" width="84" height="32" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5" rx="4"/>
+  <text x="645" y="781" text-anchor="middle" font-weight="bold" font-size="11">:Upsample</text>
+
+  <rect x="718" y="760" width="84" height="32" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5" rx="4"/>
+  <text x="760" y="781" text-anchor="middle" font-weight="bold" font-size="11">:Train Model</text>
+
+  <rect x="833" y="760" width="84" height="32" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5" rx="4"/>
+  <text x="875" y="781" text-anchor="middle" font-weight="bold" font-size="11">:Score Model</text>
+
+  <!-- ═══════════════════════════════════════
+       LEGEND
+  ═══════════════════════════════════════ -->
+  <rect x="15" y="800" width="960" height="46" fill="#f9f9f9" stroke="#ccc" stroke-width="0.5" rx="4"/>
+  <line x1="30"  y1="818" x2="75"  y2="818" stroke="black" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="82" y="822" font-size="11">Synchronous call (solid arrow)</text>
+  <line x1="260" y1="818" x2="305" y2="818" stroke="gray" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
+  <text x="312" y="822" font-size="11">Return message (dashed arrow)</text>
+  <line x1="510" y1="818" x2="555" y2="818" stroke="#555" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+  <text x="562" y="822" font-size="11">Model input (dashed call)</text>
+
+  <rect x="30"  y="830" width="12" height="10" fill="#9FE1CB"/>
+  <text x="48" y="840" font-size="11">Python scripts (teal)</text>
+  <rect x="190" y="830" width="12" height="10" fill="#B5D4F4"/>
+  <text x="208" y="840" font-size="11">Azure ML components (blue)</text>
+  <rect x="400" y="830" width="12" height="10" fill="#FAC775"/>
+  <text x="418" y="840" font-size="11">Model components (amber)</text>
+
+</svg>
+
+<p style="text-align:center; font-size:11px; color:#888; margin-top:16px;">
+  Group D – DSC592 Spring 2026 &nbsp;|&nbsp; Final Pipeline Sequence Diagram &nbsp;|&nbsp;
+  Solid arrows = synchronous calls &nbsp;|&nbsp; Dashed gray arrow = return to user
+</p>
+
+</body>
+</html>
